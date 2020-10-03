@@ -15,7 +15,6 @@ function newUser(username) {
             }
 
 
-            console.log(json)
             client.send(JSON.stringify(json));
         }
     });
