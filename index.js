@@ -19,55 +19,11 @@ let newUser = username => {
     });
 }
 
-let jobids = {}
-let clients = {}
-
 ws.on('connection', function connection(wss) {
 
-    wss.on('message', async function incoming(message) {
-
+    wss.on('message', function incoming(message) {
         if (message === 'Keep Alive!') return wss.send('Keep Alive!');
-        else if (JSON.parse(message)['Action'] === 'Connected') {
-            clients[JSON.parse(message)['Username']] = wss; 
-
-            return newUser(JSON.parse(message)['Username']);
-        }
-        else if (JSON.parse(message)['Request'] === 'JobId') {
-
-            let user = JSON.parse(message)['Username'];
-            let localuser = JSON.parse(message)['MyUsername']
-            
-            if (!clients[user]) return;
-
-            clients[user].send(JSON.stringify({
-                'Action': 'RequestedJobId',
-                'User': user
-            }));
-
-            let jobid = await jobids[user];
-
-            let obj = JSON.stringify({
-                'Game': jobid,
-                'User': localuser
-            })
-            
-            wss.send(obj)
-
-            return;
-            
-        } else if (JSON.parse(message)['Action'] === 'SendJobId') {
-            let jobid = JSON.parse(message)['JobId'];
-            let placeid = JSON.parse(message)['PlaceId'];
-            
-            let username = JSON.parse(message)['User'];
-            
-            let json = JSON.stringify({
-                'JobId': jobid,
-                'PlaceId': placeid
-            })
-            jobids[username] = json
-            return
-        }
+        else if (JSON.parse(message)['Action'] == 'Connected') return newUser(JSON.parse(message)['Username']);
         
         let lessThanFour = message.length < 1 ? true : false;
 
